@@ -1,33 +1,19 @@
 {
-	"name": "next",
-	"version": "0.1.0",
+	"name": "cf-ai-learning-worker",
+	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbopack",
-		"build": "next build",
-		"start": "next start",
-		"lint": "next lint",
-		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-		"upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
-		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"tail": "wrangler tail",
+		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"@opennextjs/cloudflare": "^1.11.0",
-		"next": "15.5.6",
-		"react": "19.1.0",
-		"react-dom": "19.1.0"
+		"hono": "^4.10.5"
 	},
 	"devDependencies": {
-		"@eslint/eslintrc": "^3",
-		"@tailwindcss/postcss": "^4",
-		"@types/node": "^20.19.25",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
-		"eslint": "^9",
-		"eslint-config-next": "15.4.6",
-		"tailwindcss": "^4",
-		"typescript": "^5",
+		"@cloudflare/workers-types": "^4.20251111.0",
+		"typescript": "^5.9.3",
 		"wrangler": "^4.47.0"
 	}
 }

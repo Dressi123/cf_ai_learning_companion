@@ -1,33 +1,22 @@
 {
 	"compilerOptions": {
-		"target": "ES2017",
-		"lib": ["dom", "dom.iterable", "esnext"],
-		"allowJs": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"noEmit": true,
-		"esModuleInterop": true,
-		"module": "esnext",
+		"target": "ES2021",
+		"lib": ["ES2021"],
+		"module": "ES2022",
 		"moduleResolution": "bundler",
+		"types": ["@cloudflare/workers-types"],
 		"resolveJsonModule": true,
+		"allowJs": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
 		"isolatedModules": true,
-		"jsx": "preserve",
-		"incremental": true,
-		"plugins": [
-			{
-				"name": "next"
-			}
-		],
+		"noEmit": true,
 		"paths": {
 			"@/*": ["./src/*"]
-		},
-		"types": [
-			"./cloudflare-env.d.ts",
-			"./cloudflare-env.d.ts",
-			"node",
-			"node"
-		]
+		}
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-	"exclude": ["node_modules"]
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules", "dist", ".wrangler"]
 }
