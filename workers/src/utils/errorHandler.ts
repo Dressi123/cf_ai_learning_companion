@@ -17,7 +17,7 @@ export function handleError(c: Context, error: unknown, defaultMessage: string) 
   console.error('Error:', error);
 
   const errorMessage = error instanceof Error ? error.message : defaultMessage;
-  const statusCode = getStatusCode(error);
+  const statusCode = getStatusCode(error) as 400 | 413 | 500;
 
   return c.json<ErrorResponse>(
     {

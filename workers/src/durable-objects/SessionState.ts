@@ -1,17 +1,41 @@
-import type { DurableObject } from "cloudflare:workers";
+import type { Env } from "../env";
 
 /**
  * SessionState Durable Object
  * Manages user session data including document text, summaries, flashcards, and quizzes
  */
-export class SessionState implements DurableObject {
-	constructor(
-		private state: DurableObjectState,
-		private env: any
-	) {}
+export class SessionState {
+	private state: DurableObjectState;
+	private env: Env;
+
+	constructor(state: DurableObjectState, env: Env) {
+		this.state = state;
+		this.env = env;
+	}
+
+	// Session expiration (24 hours in milliseconds)
+	private SESSION_EXPIRY = 24 * 60 * 60 * 1000;
+
+	// Initialize session timestamp if not exists
+	private async initializeSession(): Promise<void> {
+		const createdAt = await this.state.storage.get<number>("createdAt");
+		if (!createdAt) {
+			await this.state.storage.put("createdAt", Date.now());
+		}
+	}
+
+	// Check if session has expired
+	private async isExpired(): Promise<boolean> {
+		const createdAt = await this.state.storage.get<number>("createdAt");
+		if (!createdAt) return false;
+
+		const now = Date.now();
+		return now - createdAt > this.SESSION_EXPIRY;
+	}
 
 	// Document text storage
 	async setDocumentText(text: string): Promise<void> {
+		await this.initializeSession();
 		await this.state.storage.put("documentText", text);
 		await this.state.storage.put("lastUpdated", Date.now());
 	}
@@ -58,6 +82,20 @@ export class SessionState implements DurableObject {
 		const method = request.method;
 
 		try {
+			// Check if session has expired
+			if (await this.isExpired()) {
+				await this.clearAll();
+				return new Response(
+					JSON.stringify({
+						error: "Session expired",
+						expired: true,
+					}),
+					{
+						status: 401,
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+			}
 			switch (url.pathname) {
 				case "/document-text":
 					if (method === "GET") {
