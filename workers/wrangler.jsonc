@@ -16,7 +16,7 @@
 	"r2_buckets": [
 		{
 			"bucket_name": "ai-learning-documents",
-			"binding": "ai_learning_documents",
+			"binding": "DOCUMENTS",
 			"remote": true
 		}
 	],

@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { Env } from "./env";
+import { getOrCreateSessionId, createSessionCookie } from "./utils/sessionHelpers";
+import { processUploadedPDF, storeExtractedText } from "./services/documentService";
+import { handleError } from "./utils/errorHandler";
+import type { UploadPDFResponse } from "./types/api";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -24,8 +28,47 @@ app.get("/", (c) => {
 
 // Document routes
 app.post("/api/documents/upload", async (c) => {
-	// TODO: Implement PDF upload
-	return c.json({ message: "Upload endpoint - to be implemented" });
+	try {
+		// Get or create session ID from cookie
+		const sessionId = getOrCreateSessionId(c.req.raw);
+
+		// Parse multipart form data
+		const formData = await c.req.formData();
+		const file = formData.get('file') as File | null;
+
+		if (!file) {
+			return c.json<UploadPDFResponse>(
+				{
+					success: false,
+					sessionId,
+					error: 'No file uploaded. Please provide a PDF file.',
+				},
+				400
+			);
+		}
+
+		// Process PDF and extract text
+		const extractedData = await processUploadedPDF(file, c.env);
+
+		// Store extracted text in Durable Object
+		await storeExtractedText(sessionId, extractedData.text, c.env);
+
+		// Return success response with session cookie
+		const response = c.json<UploadPDFResponse>(
+			{
+				success: true,
+				sessionId,
+				pageCount: extractedData.pageCount,
+			},
+			200
+		);
+
+		response.headers.set('Set-Cookie', createSessionCookie(sessionId));
+
+		return response;
+	} catch (error) {
+		return handleError(c, error, 'Failed to process PDF upload');
+	}
 });
 
 app.post("/api/documents/upload-text", async (c) => {
