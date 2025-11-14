@@ -4,7 +4,8 @@
  */
 
 import type { Context } from 'hono';
-import type { ErrorResponse } from '../types/api';
+import type { ApiResponse } from '../types/api';
+import { StatusCodes } from '../types/api';
 
 /**
  * Handles errors and returns appropriate HTTP response
@@ -14,45 +15,57 @@ import type { ErrorResponse } from '../types/api';
  * @returns JSON error response with appropriate status code
  */
 export function handleError(c: Context, error: unknown, defaultMessage: string) {
-  console.error('Error:', error);
+	console.error('Error:', error);
 
-  const errorMessage = error instanceof Error ? error.message : defaultMessage;
-  const statusCode = getStatusCode(error) as 400 | 413 | 500;
+	const errorMessage = error instanceof Error ? error.message : defaultMessage;
+	const { statusCode, code } = getStatusCodeAndCode(error);
 
-  return c.json<ErrorResponse>(
-    {
-      success: false,
-      error: errorMessage,
-    },
-    statusCode
-  );
+	return c.json<ApiResponse<null>>(
+		{
+			message: errorMessage,
+			code,
+			data: null,
+		},
+		statusCode
+	);
 }
 
 /**
- * Determines appropriate HTTP status code based on error type
+ * Determines appropriate HTTP status code and code string based on error type
  * @param error Error object or unknown
- * @returns HTTP status code
+ * @returns Object with HTTP status code and code string
  */
-function getStatusCode(error: unknown): number {
-  if (error instanceof Error) {
-    const message = error.message.toLowerCase();
+function getStatusCodeAndCode(error: unknown): { statusCode: number; code: string } {
+	if (error instanceof Error) {
+		const message = error.message.toLowerCase();
 
-    // File size errors
-    if (message.includes('too large') || message.includes('size')) {
-      return 413; // Payload Too Large
-    }
+		// Session expired
+		if (message.includes('session expired') || message.includes('expired')) {
+			return { statusCode: 401, code: StatusCodes.UNAUTHORIZED };
+		}
 
-    // Validation errors
-    if (
-      message.includes('invalid') ||
-      message.includes('not a pdf') ||
-      message.includes('no file') ||
-      message.includes('no text content')
-    ) {
-      return 400; // Bad Request
-    }
-  }
+		// File size errors
+		if (message.includes('too large') || message.includes('size')) {
+			return { statusCode: 413, code: '413_PAYLOAD_TOO_LARGE' };
+		}
 
-  // Default to internal server error
-  return 500;
+		// Not found errors
+		if (message.includes('not found') || message.includes('no document')) {
+			return { statusCode: 404, code: StatusCodes.NOT_FOUND };
+		}
+
+		// Validation errors
+		if (
+			message.includes('invalid') ||
+			message.includes('not a pdf') ||
+			message.includes('no file') ||
+			message.includes('no text content') ||
+			message.includes('please upload')
+		) {
+			return { statusCode: 400, code: StatusCodes.BAD_REQUEST };
+		}
+	}
+
+	// Default to internal server error
+	return { statusCode: 500, code: StatusCodes.INTERNAL_SERVER_ERROR };
 }

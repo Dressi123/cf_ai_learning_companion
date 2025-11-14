@@ -1,4 +1,5 @@
 import type { Env } from "../env";
+import type { Flashcard, Summary } from "../types/content";
 
 /**
  * SessionState Durable Object
@@ -45,21 +46,21 @@ export class SessionState {
 	}
 
 	// Summary storage
-	async setSummary(summary: any): Promise<void> {
+	async setSummary(summary: Summary): Promise<void> {
 		await this.state.storage.put("summary", summary);
 	}
 
-	async getSummary(): Promise<any | null> {
-		return (await this.state.storage.get<any>("summary")) || null;
+	async getSummary(): Promise<Summary | null> {
+		return (await this.state.storage.get<Summary>("summary")) || null;
 	}
 
 	// Flashcards storage
-	async setFlashcards(flashcards: any[]): Promise<void> {
+	async setFlashcards(flashcards: Flashcard[]): Promise<void> {
 		await this.state.storage.put("flashcards", flashcards);
 	}
 
-	async getFlashcards(): Promise<any[] | null> {
-		return (await this.state.storage.get<any[]>("flashcards")) || null;
+	async getFlashcards(): Promise<Flashcard[] | null> {
+		return (await this.state.storage.get<Flashcard[]>("flashcards")) || null;
 	}
 
 	// Quiz storage
@@ -119,7 +120,7 @@ export class SessionState {
 							headers: { "Content-Type": "application/json" },
 						});
 					} else if (method === "POST") {
-						const { summary } = await request.json<{ summary: any }>();
+						const { summary } = await request.json<{ summary: Summary }>();
 						await this.setSummary(summary);
 						return new Response(JSON.stringify({ success: true }), {
 							headers: { "Content-Type": "application/json" },
@@ -134,7 +135,7 @@ export class SessionState {
 							headers: { "Content-Type": "application/json" },
 						});
 					} else if (method === "POST") {
-						const { flashcards } = await request.json<{ flashcards: any[] }>();
+						const { flashcards } = await request.json<{ flashcards: Flashcard[] }>();
 						await this.setFlashcards(flashcards);
 						return new Response(JSON.stringify({ success: true }), {
 							headers: { "Content-Type": "application/json" },
