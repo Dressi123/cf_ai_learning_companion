@@ -1,52 +1,136 @@
-import Image from "next/image";
+"use client";
 
+import Toast from "./components/ErrorToast";
+import FlashcardTab from "./components/tabs/FlashcardTab";
+import QuizTab from "./components/tabs/QuizTab";
+import SummaryTab from "./components/tabs/SummaryTab";
+import Tabs from "./components/tabs/Tabs";
+import UploadTab from "./components/tabs/UploadTab";
+import { Flashcard, Summary, Question } from "../../../workers/src/types/content";
+import { useState } from "react";
+
+/**
+ * Toast message interface
+ */
+interface ToastMessage {
+	text: string;
+	type: "success" | "error";
+}
+
+/**
+ * Home component - Main page of the AI Learning Companion application
+ * Manages all application state and renders different tabs for document processing,
+ * summary generation, and flashcard studying
+ *
+ * @returns JSX element containing the complete application interface
+ */
 export default function Home() {
-	return (
-		<div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-			<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-				<Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
-				<ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-					<li className="mb-2 tracking-[-.01em]">
-						Get started by editing{" "}
-						<code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-							src/app/page.tsx
-						</code>
-						.
-					</li>
-					<li className="tracking-[-.01em]">Save and see your changes instantly.</li>
-				</ol>
+	const [notes, setNotes] = useState("");
+	const [summary, setSummary] = useState<Summary | null>(null);
+	const [file, setFile] = useState<File | null>(null);
+	const [flashcards, setFlashcards] = useState<Flashcard[] | null>(null);
+	const [quizzes, setQuizzes] = useState<Question[] | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [activeTab, setActiveTab] = useState("Upload");
+	const [toast, setToast] = useState<ToastMessage | null>(null);
 
-				<div className="flex gap-4 items-center flex-col sm:flex-row">
-					<a
-						className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read our docs
-					</a>
+	const tabs = ["Upload", "Summary", "Flashcards", "Quiz"];
+
+	/**
+	 * Resets all application state to initial values
+	 * Clears uploaded content, generated data, and returns to upload tab
+	 */
+	const handleReset = () => {
+		setNotes("");
+		setFile(null);
+		setSummary(null);
+		setActiveTab("Upload");
+		setFlashcards(null);
+		setToast(null);
+	};
+
+	/**
+	 * Helper function to show error messages
+	 */
+	const showError = (message: string) => {
+		setToast({ text: message, type: "error" });
+	};
+
+	/**
+	 * Helper function to show success messages
+	 */
+	const showSuccess = (message: string) => {
+		setToast({ text: message, type: "success" });
+	};
+
+	return (
+		<div className="font-sans items-center justify-items-center min-h-screen p-8 gap-16 w-full">
+			{/* Toast notification */}
+			{toast && <Toast message={toast.text} type={toast.type} onClose={() => setToast(null)} />}
+
+			{/* Header */}
+			<div className="container mx-auto px-4">
+				<div className="text-center mb-8">
+					<h2 className="text-3xl font-bold text-gray-800 dark:text-white">AI Learning Companion</h2>
 				</div>
-			</main>
-			<footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-					Learn
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-					Go to nextjs.org →
-				</a>
-			</footer>
+			</div>
+
+			{/* Tabs for navigation */}
+			<Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
+
+			{/* Main content area */}
+			<div className="mx-auto w-full">
+				{/* Upload Tab */}
+				{activeTab === "Upload" && (
+					<UploadTab
+						notes={notes}
+						setNotes={setNotes}
+						file={file}
+						setFile={setFile}
+						handleReset={handleReset}
+						isLoading={isLoading}
+						showError={showError}
+						showSuccess={showSuccess}
+						setIsLoading={setIsLoading}
+						setActiveTab={setActiveTab}
+					/>
+				)}
+
+				{/* Summary Tab */}
+				{activeTab === "Summary" && (
+					<SummaryTab
+						summary={summary}
+						isLoading={isLoading}
+						setSummary={setSummary}
+						setIsLoading={setIsLoading}
+						showError={showError}
+						setActiveTab={setActiveTab}
+						handleReset={handleReset}
+					/>
+				)}
+
+				{/* Flashcards Tab */}
+				{activeTab === "Flashcards" && (
+					<FlashcardTab
+						flashcards={flashcards}
+						handleReset={handleReset}
+						setFlashcards={setFlashcards}
+						showError={showError}
+						setActiveTab={setActiveTab}
+					/>
+				)}
+
+				{/* Quiz Tab */}
+				{activeTab === "Quiz" && (
+					<QuizTab
+						quizzes={quizzes}
+						handleReset={handleReset}
+						showError={showError}
+						setActiveTab={setActiveTab}
+						setQuizzes={setQuizzes}
+					/>
+				)}
+			</div>
 		</div>
 	);
 }

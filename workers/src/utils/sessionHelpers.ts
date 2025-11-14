@@ -39,5 +39,7 @@ export function getOrCreateSessionId(request: Request): string {
  * @returns Cookie header value with security attributes
  */
 export function createSessionCookie(sessionId: string): string {
-  return `${SESSION_COOKIE_NAME}=${sessionId}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_MAX_AGE}`;
+  // Use Lax for cross-origin cookie support (localhost:3000 -> localhost:8787)
+  // Remove Secure flag for local development (would need HTTPS)
+  return `${SESSION_COOKIE_NAME}=${sessionId}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_MAX_AGE}`;
 }
