@@ -56,7 +56,7 @@ Text: ${documentText}`;
 
 	const aiResponse = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
 		prompt: prompt,
-		max_tokens: 2048,
+		max_tokens: 4096,
 		response_format: {
 			type: "json_schema",
 			json_schema: summarySchema,
@@ -71,9 +71,7 @@ Text: ${documentText}`;
 	}
 
 	// Parse the JSON response
-	const summary: Summary = typeof responseData === "string"
-		? JSON.parse(responseData)
-		: responseData;
+	const summary: Summary = typeof responseData === "string" ? JSON.parse(responseData) : responseData;
 
 	if (!summary.title || !summary.overview || !Array.isArray(summary.keyPoints)) {
 		throw new Error("AI response does not contain a valid summary structure");

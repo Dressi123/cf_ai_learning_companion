@@ -79,8 +79,58 @@ app.post("/api/documents/upload", async (c) => {
 });
 
 app.post("/api/documents/upload-text", async (c) => {
-	// TODO: Implement text upload
-	return c.json({ message: "Text upload endpoint - to be implemented" });
+	try {
+		// Get or create session ID from cookie
+		const sessionId = getOrCreateSessionId(c.req.raw);
+
+		// Parse JSON body
+		const body = await c.req.json<{ text?: string }>();
+		const text = body.text;
+
+		// Validate text input
+		if (!text || text.trim().length === 0) {
+			return c.json<ApiResponse<null>>(
+				{
+					message: "No text provided. Please provide text content.",
+					code: StatusCodes.BAD_REQUEST,
+					data: null,
+				},
+				400
+			);
+		}
+
+		// Validate text length (max 1MB of text ~= 1,000,000 characters)
+		const maxTextLength = 1_000_000;
+		if (text.length > maxTextLength) {
+			return c.json<ApiResponse<null>>(
+				{
+					message: `Text too large. Maximum length is ${maxTextLength} characters.`,
+					code: StatusCodes.BAD_REQUEST,
+					data: null,
+				},
+				400
+			);
+		}
+
+		// Store text in Durable Object
+		await storeExtractedText(sessionId, text, c.env);
+
+		// Return success response with session cookie
+		const response = c.json<ApiResponse<null>>(
+			{
+				message: "Text uploaded successfully",
+				code: StatusCodes.OK,
+				data: null,
+			},
+			200
+		);
+
+		response.headers.set("Set-Cookie", createSessionCookie(sessionId));
+
+		return response;
+	} catch (error) {
+		return handleError(c, error, "Failed to process text upload");
+	}
 });
 
 // Content generation routes

@@ -13,6 +13,7 @@ interface FlashcardTabProps {
 	handleReset: () => void;
 	setFlashcards: (flashcards: FlashcardType[]) => void;
 	showError: (error: string) => void;
+	showSuccess: (message: string) => void;
 	setActiveTab: (tab: string) => void;
 }
 
@@ -26,8 +27,8 @@ interface FlashcardTabProps {
 export default function FlashcardTab({
 	flashcards,
 	setFlashcards,
-	handleReset,
 	showError,
+	showSuccess,
 	setActiveTab,
 }: FlashcardTabProps) {
 	const [isLoading, setIsLoading] = useState(false);
@@ -75,15 +76,39 @@ export default function FlashcardTab({
 		setCurrentIndex(0);
 	};
 
+	/**
+	 * Regenerates flashcards by forcing a new generation from the API
+	 * Bypasses any cached flashcards and creates fresh content
+	 */
+	const handleRegenerate = async () => {
+		setIsLoading(true);
+
+		try {
+			const result = await getFlashcards(true); // Pass force=true
+			if (result && result.data) {
+				setFlashcards(result.data.flashcards);
+				setCurrentFlashcards(result.data.flashcards);
+				setScore({ incorrect: [], correct: 0 });
+				setCurrentIndex(0);
+				showSuccess("Flashcards regenerated successfully!");
+			}
+		} catch (e) {
+			showError(e instanceof Error ? e.message : "Failed to regenerate flashcards");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mx-auto w-2/3 ">
 			<div className="flex items-center justify-between gap-2 mb-6">
 				<h2 className="text-2xl font-semibold text-gray-800 dark:text-white">AI-Generated Flashcards</h2>
 				<button
-					onClick={handleReset}
-					className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+					onClick={handleRegenerate}
+					disabled={isLoading}
+					className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					New Notes
+					Regenerate
 				</button>
 			</div>
 

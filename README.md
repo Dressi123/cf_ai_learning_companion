@@ -10,3 +10,14 @@ Durable Object (no R2 storage)
 
 lets plan the integration of Workers AI. Lets start with a summarizer that takes the text that we stored in DO and summarize it. For now just write a dummy prompt and
 ill fix it. Setup a summaryService alongside it with a generateSummary method. I want to use the llama 3.3
+
+I have three content generation services (Summary, Flashcards, Quiz) that follow the same pattern but currently have "New Notes" buttons that just reset state instead of regenerating content. The backend already supports a force=true query parameter to bypass cache.
+Update all three tabs to:
+
+1. Change "New Notes" buttons to "Regenerate" buttons
+2. Add force parameter support to API service functions
+3. Call the APIs with force=true on regenerate
+4. Show loading states and success/error toasts
+5. Maintain the exact same pattern across all three implementations
+
+Make sure the solution is type-safe, follows the existing code patterns, and reuses the toast notification system I already have.

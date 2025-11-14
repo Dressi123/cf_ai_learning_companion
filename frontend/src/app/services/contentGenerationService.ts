@@ -29,11 +29,13 @@ export const getSummary = async (force?: boolean): Promise<ApiResponse<SummaryDa
 /**
  * Retrieves or generates flashcards from the uploaded document
  *
+ * @param force - If true, forces regeneration of flashcards even if cached version exists
  * @returns Promise resolving to API response containing flashcard list
  * @throws Error if flashcard generation fails or server returns error status
  */
-export const getFlashcards = async (): Promise<ApiResponse<FlashcardsData>> => {
-	const res = await fetch(`${BASE_URL}/api/content/flashcards`, {
+export const getFlashcards = async (force?: boolean): Promise<ApiResponse<FlashcardsData>> => {
+	const url = force ? `${BASE_URL}/api/content/flashcards?force=true` : `${BASE_URL}/api/content/flashcards`;
+	const res = await fetch(url, {
 		method: "GET",
 		credentials: "include",
 	});
@@ -50,11 +52,13 @@ export const getFlashcards = async (): Promise<ApiResponse<FlashcardsData>> => {
 /**
  * Retrieves or generates quizzes from the uploaded document
  *
+ * @param force - If true, forces regeneration of quizzes even if cached version exists
  * @returns Promise resolving to API response containing quiz list
  * @throws Error if quiz generation fails or server returns error status
  */
-export const getQuizzes = async (): Promise<ApiResponse<QuizData>> => {
-	const res = await fetch(`${BASE_URL}/api/content/quiz`, {
+export const getQuizzes = async (force?: boolean): Promise<ApiResponse<QuizData>> => {
+	const url = force ? `${BASE_URL}/api/content/quiz?force=true` : `${BASE_URL}/api/content/quiz`;
+	const res = await fetch(url, {
 		method: "GET",
 		credentials: "include",
 	});

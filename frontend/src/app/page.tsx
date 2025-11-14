@@ -104,8 +104,8 @@ export default function Home() {
 						setSummary={setSummary}
 						setIsLoading={setIsLoading}
 						showError={showError}
+						showSuccess={showSuccess}
 						setActiveTab={setActiveTab}
-						handleReset={handleReset}
 					/>
 				)}
 
@@ -116,6 +116,7 @@ export default function Home() {
 						handleReset={handleReset}
 						setFlashcards={setFlashcards}
 						showError={showError}
+						showSuccess={showSuccess}
 						setActiveTab={setActiveTab}
 					/>
 				)}
@@ -124,8 +125,8 @@ export default function Home() {
 				{activeTab === "Quiz" && (
 					<QuizTab
 						quizzes={quizzes}
-						handleReset={handleReset}
 						showError={showError}
+						showSuccess={showSuccess}
 						setActiveTab={setActiveTab}
 						setQuizzes={setQuizzes}
 					/>

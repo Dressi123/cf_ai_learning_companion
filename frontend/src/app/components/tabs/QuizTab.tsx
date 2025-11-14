@@ -10,8 +10,8 @@ import { getQuizzes } from "../../services/contentGenerationService";
  */
 interface QuizTabProps {
 	quizzes: QuizType[] | null;
-	handleReset: () => void;
 	showError: (error: string) => void;
+	showSuccess: (message: string) => void;
 	setActiveTab: (tab: string) => void;
 	setQuizzes: (quizzes: QuizType[]) => void;
 }
@@ -23,7 +23,7 @@ interface QuizTabProps {
  * @param props - The component props
  * @returns A rendered quiz tab with navigation controls
  */
-export default function QuizTab({ quizzes, handleReset, showError, setActiveTab, setQuizzes }: QuizTabProps) {
+export default function QuizTab({ quizzes, showError, showSuccess, setActiveTab, setQuizzes }: QuizTabProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [currentQuizzes, setCurrentQuizzes] = useState<QuizType[] | null>(quizzes);
@@ -73,15 +73,41 @@ export default function QuizTab({ quizzes, handleReset, showError, setActiveTab,
 		setFinished(false);
 	};
 
+	/**
+	 * Regenerates quiz questions by forcing a new generation from the API
+	 * Bypasses any cached quiz and creates fresh content
+	 */
+	const handleRegenerate = async () => {
+		setIsLoading(true);
+
+		try {
+			const result = await getQuizzes(true); // Pass force=true
+			if (result && result.data) {
+				setQuizzes(result.data.quiz);
+				setCurrentQuizzes(result.data.quiz);
+				setScore(0);
+				setCurrentIndex(0);
+				setAnsweredQuestions(new Set());
+				setFinished(false);
+				showSuccess("Quiz regenerated successfully!");
+			}
+		} catch (e) {
+			showError(e instanceof Error ? e.message : "Failed to regenerate quiz.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mx-auto w-2/3 ">
 			<div className="flex items-center justify-between gap-2 mb-6">
 				<h2 className="text-2xl font-semibold text-gray-800 dark:text-white">AI-Generated Quiz</h2>
 				<button
-					onClick={handleReset}
-					className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+					onClick={handleRegenerate}
+					disabled={isLoading}
+					className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					New Notes
+					Regenerate
 				</button>
 			</div>
 

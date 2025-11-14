@@ -14,8 +14,8 @@ interface SummaryTabProps {
 	setSummary: (summary: Summary | null) => void;
 	setIsLoading: (loading: boolean) => void;
 	showError: (error: string) => void;
+	showSuccess: (message: string) => void;
 	setActiveTab: (tab: string) => void;
-	handleReset: () => void;
 }
 
 /**
@@ -31,8 +31,8 @@ export default function SummaryTab({
 	setSummary,
 	setIsLoading,
 	showError,
+	showSuccess,
 	setActiveTab,
-	handleReset,
 }: SummaryTabProps) {
 	const hasFetchedSummary = useRef(false);
 
@@ -78,15 +78,37 @@ export default function SummaryTab({
 		};
 	}, [summary, setSummary, setIsLoading, showError]);
 
+	/**
+	 * Regenerates the summary by forcing a new generation from the API
+	 * Bypasses any cached summary and creates fresh content
+	 */
+	const handleRegenerate = async () => {
+		setIsLoading(true);
+
+		try {
+			const regeneratedSummary = await getSummary(true); // Pass force=true
+			if (regeneratedSummary && regeneratedSummary.data) {
+				setSummary(regeneratedSummary.data.summary);
+				showSuccess("Summary regenerated successfully!");
+			}
+		} catch (err) {
+			console.error("Failed to regenerate summary:", err);
+			showError("Could not regenerate summary. Please try again.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mx-auto w-2/3">
 			<div className="flex items-center justify-between mb-6">
 				<h2 className="text-2xl font-semibold text-gray-800 dark:text-white">AI-Generated Summary</h2>
 				<button
-					onClick={handleReset}
-					className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+					onClick={handleRegenerate}
+					disabled={isLoading}
+					className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					New Notes
+					Regenerate
 				</button>
 			</div>
 
