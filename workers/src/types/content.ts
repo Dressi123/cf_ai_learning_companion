@@ -24,3 +24,20 @@ export interface SummaryResponse {
 	overview: string;
 	keyPoints: string[];
 }
+
+export interface AnswerOption {
+	id: number;
+	option: string;
+	explanation: string;
+}
+
+export interface Question {
+	id: number;
+	question: string;
+	answerOptions: AnswerOption[];
+	answerId: number;
+}
+
+export interface QuizResponse {
+	questions: Question[];
+}

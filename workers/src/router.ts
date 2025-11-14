@@ -5,10 +5,11 @@ import { getOrCreateSessionId, createSessionCookie } from "./utils/sessionHelper
 import { processUploadedPDF, storeExtractedText } from "./services/documentService";
 import { generateSummary } from "./services/summaryService";
 import { generateFlashcards } from "./services/flashcardService";
+import { generateQuiz } from "./services/quizService";
 import { handleError } from "./utils/errorHandler";
-import type { ApiResponse, UploadData, FlashcardsData, SummaryData } from "./types/api";
+import type { ApiResponse, UploadData, FlashcardsData, SummaryData, QuizData } from "./types/api";
 import { StatusCodes } from "./types/api";
-import type { Flashcard, Summary } from "./types/content";
+import type { Flashcard, Summary, Question } from "./types/content";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -184,8 +185,53 @@ app.get("/api/content/flashcards", async (c) => {
 });
 
 app.get("/api/content/quiz", async (c) => {
-	// TODO: Implement quiz generation
-	return c.json({ message: "Quiz endpoint - to be implemented" });
+	try {
+		// Get session ID from cookie/header
+		const sessionId = getOrCreateSessionId(c.req.raw);
+
+		// Get the Durable Object stub
+		const id = c.env.SESSION_STATE.idFromName(sessionId);
+		const stub = c.env.SESSION_STATE.get(id);
+
+		// Check if force regeneration is requested
+		const forceRegenerate = c.req.query("force") === "true";
+
+		// Check if quiz already exists (unless force regeneration is requested)
+		if (!forceRegenerate) {
+			const existingResponse = await stub.fetch("http://internal/quiz", {
+				method: "GET",
+			});
+
+			if (existingResponse.ok) {
+				const data = await existingResponse.json<{ quiz?: Question[] }>();
+				if (data.quiz && data.quiz.length > 0) {
+					// Return existing quiz
+					return c.json<ApiResponse<QuizData>>({
+						message: "Quiz retrieved successfully",
+						code: StatusCodes.OK,
+						data: {
+							cached: true,
+							quiz: data.quiz,
+						},
+					});
+				}
+			}
+		}
+
+		// Generate new quiz using AI
+		const quiz = await generateQuiz(sessionId, c.env);
+
+		return c.json<ApiResponse<QuizData>>({
+			message: "Quiz generated successfully",
+			code: StatusCodes.OK,
+			data: {
+				cached: false,
+				quiz,
+			},
+		});
+	} catch (error) {
+		return handleError(c, error, "Failed to generate quiz");
+	}
 });
 
 export default app;

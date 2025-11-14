@@ -2,7 +2,7 @@
  * API Response Types
  */
 
-import type { Flashcard, Summary } from "./content";
+import type { Flashcard, Summary, Question } from "./content";
 
 /**
  * Standardized API Response
@@ -24,6 +24,11 @@ export interface FlashcardsData {
 export interface SummaryData {
 	cached: boolean;
 	summary: Summary;
+}
+
+export interface QuizData {
+	cached: boolean;
+	quiz: Question[];
 }
 
 export interface UploadData {
