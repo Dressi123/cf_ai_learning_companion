@@ -1,7 +1,7 @@
 import { ApiResponse, SummaryData, FlashcardsData, QuizData } from "../../../../workers/src/types/api";
 
 /** Base URL for the API endpoints */
-const BASE_URL = "https://cf-ai-learning-worker.andreas-jack-2002.workers.dev";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 /**
  * Retrieves or generates a summary of the uploaded document
