@@ -17,7 +17,7 @@ const app = new Hono<{ Bindings: Env }>();
 app.use(
 	"*",
 	cors({
-		origin: ["http://localhost:3000", "https://*.pages.dev"],
+		origin: ["http://localhost:3000", "https://e28adf82.cf-ai-learning-companion.pages.dev"],
 		credentials: true,
 	})
 );

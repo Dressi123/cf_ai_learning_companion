@@ -1,0 +1,28 @@
+# Wrangler ignore file for Cloudflare Pages deployment
+# Exclude files/directories that shouldn't be deployed
+
+# Next.js cache files (these are too large for Pages)
+.next/cache/
+
+# Build cache
+.next/standalone/
+.next/static/chunks/*.map
+
+# Source maps (optional - remove if you want them deployed)
+**/*.map
+
+# Development files
+node_modules/
+.git/
+.env.local
+.env*.local
+
+# IDE files
+.vscode/
+.idea/
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
