@@ -10,12 +10,12 @@
 
 ## 🚀 Live Demo
 
--   **Frontend**: [https://e28adf82.cf-ai-learning-companion.pages.dev](https://e28adf82.cf-ai-learning-companion.pages.dev)
--   **API**: [https://cf-ai-learning-worker.andreas-jack-2002.workers.dev](https://cf-ai-learning-worker.andreas-jack-2002.workers.dev)
+-   **Frontend**: [https://3f1a9605.cf-ai-learning-companion-9e3.pages.dev](https://3f1a9605.cf-ai-learning-companion-9e3.pages.dev)
+-   **API**: [https://cf-ai-learning-companion.ajchristiansen.workers.dev](https://cf-ai-learning-companion.ajchristiansen.workers.dev)
 
 ## 🎮 Try It Out (Live Demo)
 
-Visit the [live application](https://e28adf82.cf-ai-learning-companion.pages.dev) and test all features in minutes:
+Visit the [live application](https://3f1a9605.cf-ai-learning-companion-9e3.pages.dev) and test all features in minutes:
 
 ### 1. Upload Content
 
@@ -85,7 +85,7 @@ This application satisfies all Cloudflare internship assignment requirements:
 ┌──────────────────────────────────────────────────────────────┐
 │  Frontend (Cloudflare Pages)                                 │
 │  Next.js 15.5 + React 19 + Tailwind CSS 4                    │
-│  https://e28adf82.cf-ai-learning-companion.pages.dev         │
+│  https://3f1a9605.cf-ai-learning-companion-9e3.pages.dev     │
 └────────────────────┬─────────────────────────────────────────┘
                      │ HTTPS/REST (credentials: include)
                      │ Session cookies (SameSite=None; Secure)
@@ -96,7 +96,7 @@ This application satisfies all Cloudflare internship assignment requirements:
 │  - GET  /api/content/summary?force=true                      │
 │  - GET  /api/content/flashcards?force=true                   │
 │  - GET  /api/content/quiz?force=true                         │
-│  https://cf-ai-learning-worker.andreas-jack-2002.workers.dev │
+│  https://cf-ai-learning-companion.ajchristiansen.workers.dev │
 └─┬──────────────┬─────────────────┬───────────────────────────┘
   │              │                 │
   ↓              ↓                 ↓
@@ -413,7 +413,7 @@ Upload a PDF file for processing.
 **Request:**
 
 ```bash
-curl -X POST https://cf-ai-learning-worker.andreas-jack-2002.workers.dev/api/documents/upload \
+curl -X POST https://cf-ai-learning-companion.ajchristiansen.workers.dev/api/documents/upload \
   -F "file=@document.pdf" \
   --cookie-jar cookies.txt
 ```
@@ -439,7 +439,7 @@ Upload raw text for processing.
 **Request:**
 
 ```bash
-curl -X POST https://cf-ai-learning-worker.andreas-jack-2002.workers.dev/api/documents/upload-text \
+curl -X POST https://cf-ai-learning-companion.ajchristiansen.workers.dev/api/documents/upload-text \
   -H "Content-Type: application/json" \
   -d '{"text": "Your text content here..."}' \
   --cookie-jar cookies.txt
@@ -458,7 +458,7 @@ Generate or retrieve document summary.
 **Request:**
 
 ```bash
-curl https://cf-ai-learning-worker.andreas-jack-2002.workers.dev/api/content/summary \
+curl https://cf-ai-learning-companion.ajchristiansen.workers.dev/api/content/summary \
   --cookie cookies.txt
 ```
 
