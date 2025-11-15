@@ -13,14 +13,16 @@ import type { Flashcard, Summary, Question } from "./types/content";
 
 const app = new Hono<{ Bindings: Env }>();
 
-// CORS middleware
-app.use(
-	"*",
-	cors({
-		origin: ["http://localhost:3000", "https://3f1a9605.cf-ai-learning-companion-9e3.pages.dev"],
+// CORS middleware - dynamically configure allowed origins
+app.use("*", async (c, next) => {
+	const frontendUrl = c.env.FRONTEND_URL;
+	const allowedOrigins = ["http://localhost:3000", frontendUrl];
+
+	return cors({
+		origin: allowedOrigins,
 		credentials: true,
-	})
-);
+	})(c, next);
+});
 
 // Health check
 app.get("/", (c) => {

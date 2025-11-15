@@ -12,4 +12,7 @@ export interface Env {
 
 	// Durable Object binding for session state
 	SESSION_STATE: DurableObjectNamespace;
+
+	// Frontend URL for CORS (environment variable)
+	FRONTEND_URL: string;
 }

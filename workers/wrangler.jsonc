@@ -47,5 +47,9 @@
 	// Observability
 	"observability": {
 		"enabled": true
+	},
+	// Environment variables
+	"vars": {
+		"FRONTEND_URL": "https://e28adf82.cf-ai-learning-companion.pages.dev"
 	}
 }
