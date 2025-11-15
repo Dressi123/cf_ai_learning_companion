@@ -352,7 +352,7 @@ wrangler login
 wrangler r2 bucket create ai-learning-documents
 
 # Create KV namespace (one-time setup)
-wrangler kv:namespace create CACHE
+wrangler kv namespace create CACHE
 
 # Start local dev server
 npm run dev  # Runs on http://localhost:8787
