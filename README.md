@@ -10,7 +10,7 @@
 
 ## 🚀 Live Demo
 
--   **Frontend**: [https://3f1a9605.cf-ai-learning-companion-9e3.pages.dev](https://3f1a9605.cf-ai-learning-companion-9e3.pages.dev)
+-   **Frontend**: [https://cf-ai-learning-companion-9e3.pages.dev](https://cf-ai-learning-companion-9e3.pages.dev)
 -   **API**: [https://cf-ai-learning-companion.ajchristiansen.workers.dev](https://cf-ai-learning-companion.ajchristiansen.workers.dev)
 
 ## 🎮 Try It Out (Live Demo)
